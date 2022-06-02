@@ -18,15 +18,15 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('avatar')->nullable();
             $table->string('email')->unique();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('phone')->nullable();
             $table->string('link')->nullable();
             $table->integer('role')->default(1);
             $table->text('bio')->nullable();
             $table->string('position')->nullable();
             $table->boolean('gender')->default(false);
-            $table->string('city');
-            $table->foreignId('company_id')->constrained();
+            $table->string('city')->nullable();
+            $table->foreignId('company_id')->nullable()->constrained();
 
             $table->timestamps();
         });

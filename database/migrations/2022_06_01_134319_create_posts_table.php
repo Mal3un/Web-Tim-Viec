@@ -29,6 +29,7 @@ class CreatePostsTable extends Migration
             $table->date('end_date')->nullable();
             $table->integer('number_applicants')->nullable();
             $table->integer('status')->default(0);
+            $table->boolean('is_pinned')->default(false);
             $table->string('slug');
             $table->timestamps();
             $table->softDeletes();

@@ -19,21 +19,22 @@ class UserSeeder extends Seeder
         $arr =[];
         $faker = \Faker\Factory::create();
         $companies = Company::query()->pluck('id')->toArray();
-        for($i = 1 ; $i <= 10 ; $i++){
+        for($i = 1; $i <= 500; $i++){
             $arr[] = [
-                'name' => $faker->firstName . ' ' . $faker->lastName,
+                'name'     => $faker->firstName . ' ' . $faker->lastName,
                 'avatar' => $faker->imageUrl(),
                 'email' => $faker->email,
                 'password' => $faker->password,
                 'phone' => $faker->phoneNumber,
                 'link' => null,
-                'role' => $faker->randomElement([UserRoleEnum::getValues()]),
-                'bio' =>$faker->boolean ? $faker->word : null,
+                'role' => $faker->randomElement(UserRoleEnum::getValues()),
+                'bio' => $faker->boolean ? $faker->word : null,
                 'position' => $faker->jobTitle,
                 'gender' => $faker->boolean,
                 'city' => $faker->city,
-                'company_id' => array_rand($companies),
+                'company_id' => $companies[array_rand($companies)],
             ];
+
         }
         User::insert($arr);
     }
