@@ -17,7 +17,7 @@ class CreatePostsTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('company_id')->constrained();
-            $table->string('job title');
+            $table->string('job_title');
             $table->string('district');
             $table->string('city');
             $table->boolean('is_partime');

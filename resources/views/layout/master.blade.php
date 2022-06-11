@@ -4,19 +4,19 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Hyper - {{config('app.name')}}</title>
+    <title>{{ $title ?? '' }} - {{config('app.name')}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
     <meta content="Coderthemes" name="author" />
     <!-- App favicon -->
     <link rel="shortcut icon" href="assets/images/favicon.ico">
-
+    <link href="{{asset('/css/checkbox.css')}}" rel="stylesheet" type="text/css" />
     <!-- third party css -->
     <link href="{{asset('/css/jquery-jvectormap-1.2.2.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('/css/icons.min.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('/css/app-creative.min.css')}}" rel="stylesheet" type="text/css" id="light-style" />
     <link href="{{asset('/css/app-creative-dark.min.css')}}" rel="stylesheet" type="text/css" id="dark-style" />
-
+    @stack('css')
 </head>
 
 <body class="loading" data-layout-config='{"leftSideBarTheme":"dark","layoutBoxed":false, "leftSidebarCondensed":false, "leftSidebarScrollable":false,"darkMode":false, "showRightSidebarOnStart": true}'>
@@ -38,33 +38,14 @@
 
             <!-- Start Content-->
             <div class="container-fluid">
-
-                <!-- start page title -->
                 <div class="row">
                     <div class="col-12">
                         <div class="page-title-box">
-                            <div class="page-title-right">
-                                <form class="form-inline">
-                                    <div class="form-group">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-light" id="dash-daterange">
-                                            <div class="input-group-append">
-                                                        <span class="input-group-text bg-success border-success text-white">
-                                                            <i class="mdi mdi-calendar-range font-13"></i>
-                                                        </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <a href="javascript: void(0);" class="btn btn-success ml-2">
-                                        <i class="mdi mdi-autorenew"></i>
-                                    </a>
-                                </form>
-                            </div>
-                            <h4 class="page-title">Vertical</h4>
+                            <h4 class="page-title">{{ $title ?? '' }}</h4>
                         </div>
                     </div>
                 </div>
-                <!-- end page title -->
+                @yield('content')
             </div>
             <!-- container -->
 
@@ -148,9 +129,11 @@
 <script src="{{asset('/js/vendor/apexcharts.min.js')}}"></script>
 <script src="{{asset('/js/jquery-jvectormap-1.2.2.min.js')}}"></script>
 <script src="{{asset('/js/jquery-jvectormap-world-mill-en.js')}}"></script>
+<script src="{{asset('/js/helper.js')}}"></script>
 <!-- third party js ends -->
 
 <!-- demo app -->
+@stack('js')
 <script src="assets/js/pages/demo.dashboard.js"></script>
 <!-- end demo js-->
 </body>

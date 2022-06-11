@@ -2,85 +2,53 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Post\checkSlugRequest;
+use App\Http\Requests\Post\generateSlugRequest;
 use App\Models\Post;
-use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdatePostRequest;
+use Cviebrock\EloquentSluggable\Services\SlugService;
+use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\View;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Throwable;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+    use ResponseTrait;
+    private object $model;
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StorePostRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StorePostRequest $request)
-    {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Post $post)
+    public function __construct()
     {
-        //
+        $this->model = Post::query();
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Post $post)
+    public function index() : JsonResponse
     {
-        //
+        $data = $this->model->paginate();
+        foreach ($data as $each) {
+            $each->currency_salary = $each->currency_salary_code;
+            $each->status = $each->status_name;
+        }
+        $arr['data'] = $data->getCollection();
+        $arr['pagination'] = $data->linkCollection();
+
+        return $this->successResponse($arr);
     }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdatePostRequest  $request
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdatePostRequest $request, Post $post)
+    public function generateSlug(generateSlugRequest $request) : JsonResponse
     {
-        //
+        try{
+            $title = $request->get('title');
+            $slug = SlugService::createSlug(Post::class, 'slug', $title);
+            return $this->successResponse($slug);
+        }catch(Throwable $e){
+            return $this->errorResponse();
+        }
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Post $post)
+    public function checkSlug(checkSlugRequest $request): JsonResponse
     {
-        //
+        return $this->successResponse();
+//        return $this->errorResponse();
+
     }
 }

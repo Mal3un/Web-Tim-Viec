@@ -39,7 +39,15 @@
                 <!-- title-->
                 <h4 class="mt-0">Sign In</h4>
                 <p class="text-muted mb-4">Enter your email address and password to access account.</p>
-
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <!-- form -->
                 <!-- form -->
                 <form action="{{route('registering')}}" method="post">
@@ -71,12 +79,18 @@
                     @endguest
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input class="form-control" type="password" required id="password" placeholder="Enter your password">
+                        <input class="form-control" type="password" required name="password" id="password" placeholder="Enter your password">
                     </div>
                     <div class="form-group">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="checkbox-signup">
                             <label class="custom-control-label" for="checkbox-signup">I accept <a href="javascript: void(0);" class="text-muted">Terms and Conditions</a></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="role" id="hr">
+                            <label class="custom-control-label" for="hr">Bạn có phải nhà tuyển dụng không ?</label>
                         </div>
                     </div>
                     <div class="form-group mb-0 text-center">

@@ -39,7 +39,15 @@
                 <!-- title-->
                 <h4 class="mt-0">Sign In</h4>
                 <p class="text-muted mb-4">Enter your email address and password to access account.</p>
-
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <!-- form -->
                 <form action="#">
                     <div class="form-group">
