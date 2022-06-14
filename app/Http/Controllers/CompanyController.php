@@ -24,4 +24,11 @@ class CompanyController extends Controller
             ->get();
         return $this->successResponse($data);
     }
+    public function checkName($companyName) : JsonResponse
+    {
+        $check = $this->model
+            ->where('name', $companyName)
+            ->exists();
+        return $this->successResponse($check);
+    }
 }

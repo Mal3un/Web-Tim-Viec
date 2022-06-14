@@ -65,5 +65,4 @@ class PostController extends Controller
     {
         return $request->all();
     }
-
 }

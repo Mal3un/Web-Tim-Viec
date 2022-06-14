@@ -11,9 +11,6 @@
     <div class="row">
         <div class="col-12">
             <div class="card p-4">
-                <div id="div-error" class="alert alert-danger d-none">
-
-                </div>
                 <div class="card-body">
                     <form action="{{route('admin.posts.store')}}" id="form-create-post" method="post" class="d-flex flex-column">
                         @csrf
@@ -27,14 +24,14 @@
                                 <select name="languages[]" multiple id="select-language" class="form-control "></select>
                             </div>
                         </div>
-                        <div class="form-group d-flex ">
+                        <div class="form-group d-flex select-location">
                             <div class="col-md-4">
                                 <label for="select-city">City (*)</label>
                                 <select name="city" id="select-city" class="form-control"></select>
                             </div>
                             <div class="col-md-4">
                                 <label for="select-district">District </label>
-                                <select name="district" id="select-district" class="form-control"></select>
+                                <select name="district" id="select-district" class="form-control select-district"></select>
                             </div>
                         </div>
                         <div class="form-group d-flex col">
@@ -159,39 +156,78 @@
 
             function checkCompany() {
                 $.ajax({
-                    url: '{{ route('api.companies.check') }}/' + $("#select-company").val(),
+                    url: '{{ route("api.companies.check") }}/' + $("#select-company").val(),
                     type: 'GET',
                     dataType: 'json',
                     success: async function (response) {
                         if (response.data) {
-                            submitForm('post');
+                            submitForm();
                         } else {
                             $("#modal-company").modal("show");
                             $("#company").val($("#select-company").val());
                             $("#city").val($("#select-city").val()).trigger('change');
+
                         }
                     }
                 });
             }
+            function submitForm() {
+                $.ajax({
+                    url: $("#form-create-post").attr('action'),
+                    type: 'POST',
+                    dataType: 'json',
+                    data: $("#form-create-post").serialize(),
+                    success: function (response) {
+                        $.toast({
+                            heading: 'Success !',
+                            text: 'Your post have been created.',
+                            showHideTransition: 'fade',
+                            icon: 'success',
+                            position: 'top-right',
+                        })
+                    },
+                    error: function (response) {
+                        const errors = Object.values(response.responseJSON.errors);
+                        errors.forEach(function (each) {
+                            each.forEach(function (error) {
+                                $.toast({
+                                    heading: 'Error !',
+                                    text: error,
+                                    showHideTransition: 'fade',
+                                    width: '100%',
+                                    hideAfter: 5000,
+                                    icon: 'error',
+                                    position: 'top-right',
+                                })
+                            });
+                        });
+                    }
+                });
+            }
 
-            async function loadDistrict(){
-                $('#select-district').empty();
-                const path = $("#select-city option:selected").data('path');
+            async function loadDistrict(parent){
+                parent.find(".select-district").empty();
+                const path = parent.find("option:selected").data('path');
                 const response = await fetch('{{ asset('location/') }}' + path);
                 const districts = await response.json();
+                let string = '';
+                const selectedValue = $("#select-district").val();
                 $.each(districts.district, function(index, each) {
-                        $('#select-district').append(`
-                            <option >
-                                 ${each.pre} ${each.name}
-                            </option>`
-                        );
+                    string += `<option`;
+                    if (selectedValue === each.name) {
+                        string += ` selected `;
+                    }
+                    string += `>${each.pre} ${each.name}</option>`;
                 });
+                parent.find(".select-district").append(string);
             }
             $(document).ready(async function() {
                 // $('#currency_salary').select2();
                 $('#currency_salary').select2();
-                $('#select-city').select2();
                 $('#select-district').select2();
+                $('#select-city').select2();
+                $('#city').select2();
+                $('#district').select2();
                 const response = await fetch(`{{ asset('location/index.json') }}`);
                 const cities = await response.json();
                 $.each(cities, function (index, each) {
@@ -200,11 +236,16 @@
                             ${index}
                         </option>`
                     );
+                    $('#city').append(`
+                        <option data-path='${each.file_path}'>
+                            ${index}
+                        </option>`
+                    );
                 });
-                $('#select-city').change(function () {
-                    loadDistrict();
+                $('#select-city , #city').change(function () {
+                    loadDistrict($(this).parents('.select-location'));
                 });
-                loadDistrict();
+                await loadDistrict($('#select-city').parents('.select-location'));
                 $("#select-company").select2({
                     tags: true,
                     ajax: {
@@ -270,7 +311,7 @@
                                 $("#btnCreatePost").removeAttribute("disabled");
                             }
                         },
-                        error: function (data) {
+                        error: function (response) {
                             $.toast({
                                 heading: 'Error !',
                                 text: 'Your slug have not been imported.',
@@ -287,6 +328,7 @@
                     company: {
                         required: true,
                     },
+
                 },
                 submitHandler: function(form) {
                     checkCompany();
@@ -294,4 +336,51 @@
             });
         </script>
     @endpush
+    <div id="modal-company" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="width: 100%;">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Company</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{route('admin.companies.store')}}" class="d-flex flex-column " method="POST">
+                        @csrf
+                        <div class="form-group d-flex mb-3">
+                            <div class="col-md-6  ">
+                                <label for="company">Company</label>
+                                <input readonly name="company" id="company" type="text" class="form-control" placeholder="Company">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex mb-3">
+                            <div class="col-md-6  ">
+                                <label for="address">Address</label>
+                                <input  name="address" id="address" type="text" class="form-control" placeholder="Company">
+                            </div>
+                            <div class="col-md-6  ">
+                                <label for="address2">Address 2</label>
+                                <input  name="address2" id="address2" type="text" class="form-control" placeholder="Company">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex select-location">
+                            <div class="col-md-6">
+                                <label for="city">City</label>
+                                <select name="city" id="city" class="form-control"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="district">District </label>
+                                <select name="district" id="district" class="form-control select-district"></select>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection()
