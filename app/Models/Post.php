@@ -16,10 +16,25 @@ class Post extends Model
     use Sluggable;
 
     protected $fillable = [
-        'company_id',
-        'job_title',
-        'city',
-        'status',
+        "company_id",
+        "job_title",
+        "district",
+        "city",
+        "can_partime",
+        "remotable",
+        "min_salary",
+        "max_salary",
+        "currency_salary",
+        "requirement",
+        "start_date",
+        "end_date",
+        "number_applicants",
+        "status",
+        "is_pinned",
+        "slug",
+        "created_at",
+        "updated_at",
+        "deleted_at"
     ];
     protected $appends = ['currency_salary_code'];
     protected static function booted()

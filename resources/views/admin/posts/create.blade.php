@@ -1,6 +1,7 @@
 @extends('layout.master')
 @push('css')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="{{asset('css/summernote-bs4.css')}}" rel="stylesheet" type="text/css" />
     <style>
         .error {
             color: red;
@@ -27,7 +28,7 @@
                         <div class="form-group d-flex select-location">
                             <div class="col-md-4">
                                 <label for="select-city">City (*)</label>
-                                <select name="city" id="select-city" class="form-control"></select>
+                                <select name="city" id="select-city" class="form-control select-city"></select>
                             </div>
                             <div class="col-md-4">
                                 <label for="select-district">District </label>
@@ -36,26 +37,26 @@
                         </div>
                         <div class="form-group d-flex col">
                             <div class="form-group ">
-                                <label class="" for="workingLocate">Job request</label>
+                                <label class="" for="workingLocate">Removable</label>
                                 <div id="workingLocate" class="d-flex col-md-12">
                                     <div class="mr-2 mb-0">
                                         <label class="container">
-                                            <span style="padding-left:16px">At work</span>
-                                            <input type="checkbox" id="at_work" checked="checked" value="0">
+                                            <span style="padding-left:16px">Office</span>
+                                            <input type="checkbox" id="office" name="removables[office]" checked="checked">
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>
                                     <div class="mr-4 mb-0">
                                         <label class="container">
                                             <span style="padding-left:16px">At home</span>
-                                            <input type="checkbox" id="at_home" value="1">
+                                            <input type="checkbox" id="remote" name="removables[remote]" >
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>
                                     <div class="d-flex mb-0">
                                         <label for="part_time" style="font-size:16px; margin-right:10px; margin-bottom:0;">Part time</label>
-                                        <input type="checkbox" id="part_time" checked data-switch="info"/>
-                                        <label for="part_time" data-off-label="No" data-on-label="Yes"></label>
+                                        <input type="checkbox" id="can_partime" name="can_partime" checked data-switch="info"/>
+                                        <label for="can_partime" data-off-label="No" data-on-label="Yes"></label>
                                     </div>
                                 </div>
                             </div>
@@ -80,8 +81,8 @@
                         </div>
                         <div class="form-group d-flex ">
                             <div class="col-sm-8">
-                                <label for="requirement">Requirement</label>
-                                <textarea style="min-height:100px" class="form-control" name="requirement" id="requirement" placeholder="Requirement"> </textarea>
+                                <label for="text-requirement">Requirement</label>
+                                <textarea name="requirement" id="text-requirement" placeholder="Requirement"> </textarea>
                             </div>
                         </div>
                         <div class="form-group d-flex ">
@@ -94,8 +95,8 @@
                                 <input type="date" name="end_date" id="end_date" class="form-control"></input>
                             </div>
                             <div class="col-md-2">
-                                <label for="number_applicant">Number Applicant</label>
-                                <input type="number" name="number_applicant" id="number_applicant" class="form-control"></input>
+                                <label for="number_applicants">Number Applicant</label>
+                                <input type="number" name="number_applicants" id="number_applicants" class="form-control"></input>
                             </div>
                         </div>
                         <div class="form-group d-flex ">
@@ -117,6 +118,8 @@
     @push('js')
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script>
+        <script src="{{asset('js/summernote-bs4.min.js')}}"></script>
+
         <script>
             function generateTitle() {
                 const languages = $('#select-language option:selected');
@@ -161,7 +164,7 @@
                     dataType: 'json',
                     success: async function (response) {
                         if (response.data) {
-                            submitForm();
+                            submitForm('post');
                         } else {
                             $("#modal-company").modal("show");
                             $("#company").val($("#select-company").val());
@@ -171,18 +174,27 @@
                     }
                 });
             }
-            function submitForm() {
+            function submitForm(type) {
+                const obj=$("#form-create-"+type);
+                var formData = new FormData(obj[0]);
                 $.ajax({
-                    url: $("#form-create-post").attr('action'),
+                    url: obj.attr('action'),
                     type: 'POST',
                     dataType: 'json',
-                    data: $("#form-create-post").serialize(),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    async: true,
+                    cache: false,
+                    enctype: 'multipart/form-data',
                     success: function (response) {
+                        $("#modal-company").modal('hide');
                         $.toast({
                             heading: 'Success !',
-                            text: 'Your post have been created.',
+                            text: `Your ${type} have been created.`,
                             showHideTransition: 'fade',
                             icon: 'success',
+                            hideAfter: 8000,
                             position: 'top-right',
                         })
                     },
@@ -207,7 +219,10 @@
 
             async function loadDistrict(parent){
                 parent.find(".select-district").empty();
-                const path = parent.find("option:selected").data('path');
+                const path = parent.find(".select-city option:selected").data('path');
+                if(!path){
+                    return;
+                }
                 const response = await fetch('{{ asset('location/') }}' + path);
                 const districts = await response.json();
                 let string = '';
@@ -222,12 +237,28 @@
                 parent.find(".select-district").append(string);
             }
             $(document).ready(async function() {
+                $("#text-requirement").summernote({
+                    height: 200,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                        ['fontname', ['fontname']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['paragraph', ['ul', 'ol', 'paragraph']],
+                        ['height', ['height']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'video']],
+                        ['view', ['fullscreen', 'codeview', 'help']],
+                    ]
+                });
                 // $('#currency_salary').select2();
-                $('#currency_salary').select2();
-                $('#select-district').select2();
-                $('#select-city').select2();
-                $('#city').select2();
-                $('#district').select2();
+                $('#country').select2({tags: true});
+                $('#currency_salary').select2({tags: true});
+                $('#select-district').select2({tags: true});
+                $('#select-city').select2({tags: true});
+                $('#city').select2({tags: true});
+                $('#district').select2({tags: true});
                 const response = await fetch(`{{ asset('location/index.json') }}`);
                 const cities = await response.json();
                 $.each(cities, function (index, each) {
@@ -287,7 +318,7 @@
                                 results: $.map(data.data, function (item) {
                                     return {
                                         text: item.name,
-                                        id: item.name
+                                        id: item.id
                                     }
                                 })
                             };
@@ -337,7 +368,7 @@
         </script>
     @endpush
     <div id="modal-company" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content" style="width: 100%;">
                 <div class="modal-header">
                     <h5 class="modal-title">Create Company</h5>
@@ -346,12 +377,12 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{route('admin.companies.store')}}" class="d-flex flex-column " method="POST">
+                    <form id="form-create-company" action="{{route('admin.companies.store')}}" class="d-flex flex-column " method="POST">
                         @csrf
                         <div class="form-group d-flex mb-3">
                             <div class="col-md-6  ">
                                 <label for="company">Company</label>
-                                <input readonly name="company" id="company" type="text" class="form-control" placeholder="Company">
+                                <input readonly name="name" id="company" type="text" class="form-control" placeholder="Company">
                             </div>
                         </div>
                         <div class="form-group d-flex mb-3">
@@ -365,20 +396,51 @@
                             </div>
                         </div>
                         <div class="form-group d-flex select-location">
-                            <div class="col-md-6">
-                                <label for="city">City</label>
-                                <select name="city" id="city" class="form-control"></select>
+                            <div class="col-md-4">
+                                <label for="country">Country</label>
+                                <select name="country" id="country" class="form-control">
+                                    @foreach($countries as $value =>$name)
+                                        <option value="{{$value}}">
+                                            {{$name}}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <label for="city">City</label>
+                                <select name="city" id="city" class="form-control select-city"></select>
+                            </div>
+                            <div class="col-md-4">
                                 <label for="district">District </label>
                                 <select name="district" id="district" class="form-control select-district"></select>
+                            </div>
+                        </div>
+                        <div class="form-group d-flex select-location">
+                            <div class="col-md-6">
+                                <label for="zipcode">Zipcode</label>
+                                <input name="zipcode" id="zipcode" class="form-control"></input>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone">Phone</label>
+                                <input name="phone" type="number" id="phone" class="form-control select-district"></input>
+                            </div>
+                        </div>
+                        <div class="form-group d-flex select-location">
+                            <div class="col-md-6">
+                                <label for="email">Email</label>
+                                <input name="email" type="email" id="email" class="form-control"></input>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="logo">Logo</label>
+                                <input id="logo" name="logo" type="file" oninput="pic.src=window.URL.createObjectURL(this.files[0])">
+                                <img id="pic" height="100"/>
                             </div>
                         </div>
 
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary">Submit</button>
+                    <button type="button" onclick="submitForm('company')" class="btn btn-primary">Submit</button>
                 </div>
             </div>
         </div>

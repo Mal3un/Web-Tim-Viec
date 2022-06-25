@@ -50,8 +50,9 @@ class StoreRequest extends FormRequest
                 'numeric',
                 'min:1',
             ],
-            'remotables'        => [
+            'removables'        => [
                 'required',
+                'nullable',
                 'array',
             ],
             'is_parttime'       => [

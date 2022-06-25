@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class LanguageController extends Controller
@@ -17,9 +18,15 @@ class LanguageController extends Controller
     }
     public function index(request $request) : JsonResponse
     {
-        $data = $this->model
-            ->where('name', 'like', '%'. $request->get('q') .'%')
-            ->get();
+        $configs = SystemConfigController::getAndCache();
+        $keySearch = $request->get('q');
+        if(isset($keySearch)){
+            $data = $configs['languages']->filter(function($each) use ($request){
+                return Str::contains(strtolower($each['name']),$request->get('q'));
+            });
+        }else{
+            $data = $configs['languages']->all();
+        }
         return $this->successResponse($data);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Company\StoreRequest;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,5 +31,12 @@ class CompanyController extends Controller
             ->where('name', $companyName)
             ->exists();
         return $this->successResponse($check);
+    }
+    public function store(StoreRequest $request)
+    {
+        $arr = $request->validated();
+        $arr['logo'] = optional($request->file('logo')->store('company_logo'));
+        Company::create($arr);
+        return $this->successResponse("thành công");
     }
 }

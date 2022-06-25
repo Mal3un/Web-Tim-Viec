@@ -819,7 +819,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <CollationName>utf8mb4_unicode_ci</CollationName>
     </table>
     <column id="244" parent="233" name="id">
-      <AutoIncrement>104</AutoIncrement>
+      <AutoIncrement>114</AutoIncrement>
       <DataType>bigint(20) unsigned|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
