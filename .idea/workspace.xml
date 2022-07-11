@@ -162,10 +162,13 @@
       <path value="$PROJECT_DIR$/vendor/phpoffice/phpspreadsheet" />
       <path value="$PROJECT_DIR$/vendor/cviebrock/eloquent-sluggable" />
       <path value="$PROJECT_DIR$/vendor/cocur/slugify" />
+      <path value="$PROJECT_DIR$/vendor/barryvdh/laravel-translation-manager" />
     </include_path>
   </component>
   <component name="ProjectId" id="29ydFLQOOFsCwivmpkT8PquBhDl" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Remove" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -251,7 +254,15 @@
       <workItem from="1655973626062" duration="3528000" />
       <workItem from="1656040624068" duration="2882000" />
       <workItem from="1656043554050" duration="2630000" />
-      <workItem from="1656164507842" duration="8181000" />
+      <workItem from="1656164507842" duration="9697000" />
+      <workItem from="1656233953593" duration="1416000" />
+      <workItem from="1656235619205" duration="46000" />
+      <workItem from="1656235691889" duration="10293000" />
+      <workItem from="1656258794848" duration="4631000" />
+      <workItem from="1656298224054" duration="9351000" />
+      <workItem from="1656334943940" duration="4190000" />
+      <workItem from="1656488948196" duration="385000" />
+      <workItem from="1656498647002" duration="132000" />
     </task>
     <servers />
   </component>

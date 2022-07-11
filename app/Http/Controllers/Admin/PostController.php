@@ -98,7 +98,6 @@ class PostController extends Controller
             if($request->has('can_partime')){
                 $arr['can_partime'] = 1;
             }
-//            dd($arr);
             $post = Post::create($arr);
             $languages = $request->get('languages');
             foreach($languages as $language){
@@ -112,7 +111,6 @@ class PostController extends Controller
             return $this->successResponse();
         } catch (Throwable $e){
             DB::rollback();
-            dd($e);
             return $this->errorResponse();
         }
     }

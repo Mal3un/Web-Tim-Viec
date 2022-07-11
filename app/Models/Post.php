@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\object_language_type_enum;
 use App\Enums\PostCurrencySalaryEnum;
 use App\Enums\PostStatusEnum;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -59,5 +60,17 @@ class Post extends Model
     public function getStatusNameAttribute(): string
     {
         return PostStatusEnum::getKey($this->status);
+    }
+    public function languages(){
+        return $this->morphToMany(
+            Language::class,
+            'object',
+            ObjectLanguage::class,
+            'object_id',
+            'language_id',
+        );
+    }
+    public function company(){
+        return $this->belongsTo(Company::class);
     }
 }

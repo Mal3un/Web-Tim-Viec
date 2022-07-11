@@ -14,7 +14,10 @@ class LanguageFactory extends Factory
     public function definition()
     {
         return [
-            'name' =>$this->faker->word(),
+            'first_name' =>$this->faker->firstName,
+            'last_name' =>$this->faker->lastName,
+            'birthdate' =>$this->faker->date,
+            'gender' =>
         ];
     }
 }
